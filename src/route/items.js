@@ -3,23 +3,21 @@ const route = express.Router();
 const { getAllItems, 
         insertItems, 
         updateItems, 
-        deleteItems  } = require('../controller/items')
+        deleteItems,  } = require('../controller/items');
+const { authentication,
+        adminAuthorization,
+        cashierAuthorization } = require('../helper/middleware/auth');
+const { getItemsRedis} = require('../helper/redis/item');
 
-const { getAllCategory,  
-        updateCategory, 
-        deleteCategory,
-        insertCategory  } = require('../controller/category')
+const singleUpload = require('../helper/middleware/upload');
 
 route
 //product route
-  .get('/items', getAllItems)
-  .post('/items', insertItems)
-  .put('/items/:id', updateItems)
-  .delete('/items/:id', deleteItems)
-//category route
-  .get('/category', getAllCategory)
-  .post('/category', insertCategory)
-  .put('/category/:id', updateCategory)
-  .delete('/category/:id', deleteCategory)
+  .get('/items', authentication, getItemsRedis, getAllItems)
+  .get('/items', authentication, adminAuthorization, getAllItems)              //cashier & admin
+  .post('/items', authentication, adminAuthorization, singleUpload, insertItems)        //admin
+  .put('/items/:id', authentication, adminAuthorization, singleUpload, updateItems)     //admin
+  .patch('/items/:id', authentication, adminAuthorization, updateItems)   //admin
+  .delete('/items/:id', authentication, adminAuthorization, deleteItems)  //admin
 
 module.exports = route

@@ -1,10 +1,9 @@
 const connection = require('../config/db');
 
 module.exports = {
-    //product model
-    modelAllItems: (sort, page, search)=> {
+    modelAllHistory: (sort, page, search)=> {
         return new Promise ((resolve, reject)=> {
-            connection.query(`SELECT * FROM product JOIN category ON product.id_category = category.id ${search} ${sort} ${page}`, (err, result)=>{
+            connection.query(`SELECT history.id, history.invoice, history.cashier, history.date, SUM(history.total_product) AS quantity, SUM(history.total_price) AS amount FROM history JOIN product ON history.id_product = product.id GROUP BY invoice ${sort} ${page} ${search} `, (err, result)=>{
                 if(err){
                     reject(new Error(err))
                 } else {
@@ -13,9 +12,9 @@ module.exports = {
             })    
         })
     },
-    modelDetailItems: (id)=> {
+    modelAllHistoryRedis: ()=> {
         return new Promise ((resolve, reject)=> {
-            connection.query(`SELECT * FROM product JOIN category ON product.id_category = category.id WHERE product.id='${id}'`, (err, result)=>{
+            connection.query(`SELECT history.id, history.invoice, history.cashier, history.date, SUM(history.total_product) AS quantity, SUM(history.total_price) AS amount FROM history JOIN product ON history.id_product = product.id GROUP BY invoice`, (err, result)=>{
                 if(err){
                     reject(new Error(err))
                 } else {
@@ -24,9 +23,9 @@ module.exports = {
             })    
         })
     },
-    modelAllItemsRedis: ()=> {
+    modelTotalHistory: ()=> {
         return new Promise ((resolve, reject)=> {
-            connection.query(`SELECT * FROM product JOIN category ON product.id_category = category.id`, (err, result)=>{
+            connection.query(`SELECT COUNT(*) as total FROM history`, (err, result)=>{
                 if(err){
                     reject(new Error(err))
                 } else {
@@ -35,9 +34,9 @@ module.exports = {
             })    
         })
     },
-    modelTotalItems: (search)=> {
+    modelInsertHistory: (data)=> {
         return new Promise ((resolve, reject)=> {
-            connection.query(`SELECT COUNT(*) as total FROM product ${search}`, (err, result)=>{
+            connection.query(`INSERT INTO history (invoice, cashier, id_product, total_product, price) VALUES ('${data.invoice}','${data.cashier}','${data.product}','${data.total_product}','${data.price}')`, (err, result)=>{
                 if(err){
                     reject(new Error(err))
                 } else {
@@ -46,9 +45,9 @@ module.exports = {
             })    
         })
     },
-    modelInsertItems: (data)=> {
+    modelUpdateHistory: (data, id)=> {
         return new Promise ((resolve, reject)=> {
-            connection.query(`INSERT INTO product (name, price, image, id_category) VALUES ('${data.name}','${data.price}','${data.image}','${data.category}')`, (err, result)=>{
+            connection.query(`UPDATE history SET invoice='${data.invoice}', cashier='${data.cashier}', id_product='${data.product}', total_product='${data.total_product}', price='${data.price}' WHERE id='${id}'`, (err, result)=>{
                 if(err){
                     reject(new Error(err))
                 } else {
@@ -57,9 +56,9 @@ module.exports = {
             })    
         })
     },
-    modelUpdateItems: (data, id)=> {
+    modelDeleteHistory: (id)=> {
         return new Promise ((resolve, reject)=> {
-            connection.query(`UPDATE product SET name='${data.name}', price='${data.price}', image='${data.image}', id_category='${data.category}' WHERE id='${id}'`, (err, result)=>{
+            connection.query(`DELETE FROM history WHERE id='${id}'`, (err, result)=>{
                 if(err){
                     reject(new Error(err))
                 } else {
@@ -68,16 +67,4 @@ module.exports = {
             })    
         })
     },
-    modelDeleteItems: (id)=> {
-        return new Promise ((resolve, reject)=> {
-            connection.query(`DELETE FROM product WHERE id='${id}'`, (err, result)=>{
-                if(err){
-                    reject(new Error(err))
-                } else {
-                    resolve(result)
-                }
-            })    
-        })
-    },
-   
 }
