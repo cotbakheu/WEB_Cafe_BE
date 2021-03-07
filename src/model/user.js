@@ -36,4 +36,15 @@ module.exports = {
             })    
         })
     },
+    modelDetail: (id)=> {
+        return new Promise ((resolve, reject)=> {
+            connection.query(`SELECT * FROM user WHERE id='${id}'`, data, (err, result)=>{
+                if(err){
+                    reject(new Error(err))
+                } else {
+                    resolve(result)
+                }
+            })    
+        })
+    },
 }

@@ -12,23 +12,33 @@ module.exports = {
       }else{
         if(result){
           const response = JSON.parse(result);
-          const name = req.query.name ? req.query.name:'';
-          const limit = req.query.limit ? req.query.limit:3
+          const search = req.query.search ? req.query.search.toString().toLowerCase():'';
+          const limit = req.query.limit ? req.query.limit:7
           const page = req.query.page ? req.query.page:1
           const offset = page === 1 ? 0 : (page-1)*limit
+          const params = req.query.params? req.query.params:'date';
+          const sort = req.query.sort? req.query.sort:'desc';
           
           const filterData = _.filter(response, (item) => {
-            return item.name.includes(name)
+            if (item.invoice.toLowerCase().includes(search)) {
+              return item.invoice.toLowerCase().includes(search)
+            } else if (item.cashier.toLowerCase().includes(search)) {
+              return item.cashier.toLowerCase().includes(search)
+            } 
           })
-          const paginationData = _.slice(filterData, offset, offset+limit)
+          if (filterData.length <= 0){
+             noData(res, 'Data Not Found')
+          }
+          const orderData = _.orderBy(filterData, params, sort);
+          const data = _.slice(orderData, offset, offset+limit)
 
           const pagination = {
             page: page,
             limit: limit,
-            total: response.length,
-            totalPage: Math.ceil(response.length/limit)
+            total: filterData.length,
+            totalPage: Math.ceil(filterData.length/limit)
           }
-          success(res, paginationData, pagination, 'Get all books from redis success')
+          success(res, 'Get all books from redis success', pagination, data)
         }else{
           next()
         }

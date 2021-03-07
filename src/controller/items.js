@@ -15,6 +15,7 @@ const fs = require('fs');
 module.exports = {
     setItemsRedis: (req, res) => {
         modelAllItemsRedis().then((response)=>{
+            console.log(response)
             const data = JSON.stringify(response);
             redisClient.set('items', data);
         }).catch((err)=>{
@@ -23,65 +24,48 @@ module.exports = {
     },
     getAllItems : async(req,res)=>{
         //sort
-        const sort = req.query.sort;
-        const sortBy = sort === undefined? '':`ORDER BY ${sort}`;
+        const sort = req.query.sort? req.query.sort: 'ASC';
+        const params = req.query.params? req.query.params: 'name';
         //pagination
-        const paging = req.query.page;
-        const queryLimit = req.query.limit;
-        const limit = queryLimit === undefined? 6: queryLimit;
-        const offset = paging <= 1? 0:(paging-1)*limit;
-        const page = paging === undefined? `LIMIT ${limit}`:`LIMIT ${offset},${limit}`;
-        //search
-        const find = req.query.search;        
-        const search = find === undefined? '': `WHERE name LIKE '%${find}%' OR price LIKE '%${find}%'`;
+        const page = req.query.page? req.query.page:1;
+        const limit = req.query.limit? req.query.limit: 6;
+        const offset = page <= 1? 0:(page-1)*limit;
+        //search        
+        const search = req.query.search? req.query.search: '%' ;
         const totalData = await modelTotalItems(search);
-      modelAllItems(sortBy, page, search)
+      modelAllItems(params, sort, limit, offset, search)
       .then((response)=> {
-          const arr = [];
-          response.forEach(element => {
-            arr.push({
-                id: element.id,
-                name: element.name,
-                price: element.price,
-                category: element.category_name,
-            })
-        });
-          if (arr.length < 1){
+          if (response.length < 1){
               noData(res, 'Data Not Found')
           } else {
-            const pages = paging === undefined? 1: paging;
-            const result = {
-                page: pages,
-                limit: limit,
+            const pagination = {
+                page,
+                limit,
                 totalData: totalData[0].total,
                 totalPage: Math.ceil(totalData[0].total/limit)
             }
             module.exports.setItemsRedis()
-            success(res, "Succes Get Data", result, arr)
+            success(res, "Succes Get Data", pagination, response)
           }
       }).catch((err)=>{
-          failed(res, "Can't Get Data", err)
+          console.log(err)
+          failed(res, "Server Error", err)
       })
     },
     insertItems : async(req,res)=>{
     const data = req.body;
-    const category = await modelAllCategory();
-    const idCategory = category.filter((element)=>{
-        if (data.category === element.category_name){
-            return element.id;
-        }
-    });
     const newData = {
         name: data.name,
         price: data.price,
         image: req.file.filename,
-        category: idCategory[0].id,
+        category: data.category,
     };
         modelInsertItems(newData)
         .then((response)=> {
             module.exports.setItemsRedis()
             success(res, 'Succesful Insert Data')
         }).catch((err)=>{
+            console.log(err)
             failed(res, "Internal Server Error", err)
         })
     },
@@ -94,7 +78,7 @@ module.exports = {
             name: data.name,
             price: data.price,
             image: req.file.filename,
-            category: data.category
+            id_category: data.id_category
         }
         fs.unlink(path, (err) => {
             if (err) {
@@ -105,6 +89,7 @@ module.exports = {
                     module.exports.setItemsRedis()
                     success(res, 'Succesful Update Data')
                 }).catch((err)=>{
+                    console.log(err)
                     failed(res, "Internal Server Error", err)
                 })
             }

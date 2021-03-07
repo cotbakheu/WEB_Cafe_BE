@@ -1,9 +1,9 @@
 const connection = require('../config/db');
 
 module.exports = {
-    modelAllHistory: (sort, page, search)=> {
+    modelAllHistory: (params, sort, limit, offset, search)=> {
         return new Promise ((resolve, reject)=> {
-            connection.query(`SELECT history.id, history.invoice, history.cashier, history.date, SUM(history.total_product) AS quantity, SUM(history.total_price) AS amount FROM history JOIN product ON history.id_product = product.id GROUP BY invoice ${sort} ${page} ${search} `, (err, result)=>{
+            connection.query(`SELECT history.id, history.invoice, history.cashier, history.date, SUM(history.total_product) AS quantity, SUM(history.price) AS amount FROM history LEFT JOIN product ON history.id_product = product.id WHERE (cashier LIKE '%${search}%' OR invoice LIKE '%${search}%') GROUP BY invoice ORDER BY ${params} ${sort} LIMIT ${offset},${limit}`, (err, result)=>{
                 if(err){
                     reject(new Error(err))
                 } else {
@@ -14,7 +14,7 @@ module.exports = {
     },
     modelAllHistoryRedis: ()=> {
         return new Promise ((resolve, reject)=> {
-            connection.query(`SELECT history.id, history.invoice, history.cashier, history.date, SUM(history.total_product) AS quantity, SUM(history.total_price) AS amount FROM history JOIN product ON history.id_product = product.id GROUP BY invoice`, (err, result)=>{
+            connection.query(`SELECT history.id, history.invoice, history.cashier, history.date, SUM(history.total_product) AS quantity, SUM(history.price) AS amount FROM history JOIN product ON history.id_product = product.id GROUP BY invoice`, (err, result)=>{
                 if(err){
                     reject(new Error(err))
                 } else {
@@ -23,9 +23,20 @@ module.exports = {
             })    
         })
     },
-    modelTotalHistory: ()=> {
+    modelTotalHistory: (search)=> {
         return new Promise ((resolve, reject)=> {
-            connection.query(`SELECT COUNT(*) as total FROM history`, (err, result)=>{
+            connection.query(`SELECT * FROM history WHERE invoice LIKE '%${search}%' OR cashier LIKE '%${search}%' GROUP BY invoice`, (err, result)=>{
+                if(err){
+                    reject(new Error(err))
+                } else {
+                    resolve(result)
+                }
+            })    
+        })
+    },
+    modelDetailHistory: (invoice)=> {
+        return new Promise ((resolve, reject)=> {
+            connection.query(`SELECT history.id, history.invoice, history.cashier, history.date, history.price, product.name FROM history LEFT JOIN product ON history.id_product = product.id WHERE history.invoice='${invoice}'`, (err, result)=>{
                 if(err){
                     reject(new Error(err))
                 } else {
@@ -36,7 +47,7 @@ module.exports = {
     },
     modelInsertHistory: (data)=> {
         return new Promise ((resolve, reject)=> {
-            connection.query(`INSERT INTO history (invoice, cashier, id_product, total_product, price) VALUES ('${data.invoice}','${data.cashier}','${data.product}','${data.total_product}','${data.price}')`, (err, result)=>{
+            connection.query(`INSERT INTO history SET ? `, data, (err, result)=>{
                 if(err){
                     reject(new Error(err))
                 } else {

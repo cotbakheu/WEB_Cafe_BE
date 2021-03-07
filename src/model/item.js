@@ -2,9 +2,9 @@ const connection = require('../config/db');
 
 module.exports = {
     //product model
-    modelAllItems: (sort, page, search)=> {
+    modelAllItems: (params, sort, limit, offset, search)=> {
         return new Promise ((resolve, reject)=> {
-            connection.query(`SELECT * FROM product JOIN category ON product.id_category = category.id ${search} ${sort} ${page}`, (err, result)=>{
+            connection.query(`SELECT * FROM product LEFT JOIN category ON product.id_category = category.id WHERE product.name LIKE '%${search}%' ORDER BY ${params} ${sort} LIMIT ${offset},${limit} `, (err, result)=>{
                 if(err){
                     reject(new Error(err))
                 } else {
@@ -37,7 +37,7 @@ module.exports = {
     },
     modelTotalItems: (search)=> {
         return new Promise ((resolve, reject)=> {
-            connection.query(`SELECT COUNT(*) as total FROM product ${search}`, (err, result)=>{
+            connection.query(`SELECT COUNT(*) as total FROM product WHERE product.name LIKE '%${search}%'`, (err, result)=>{
                 if(err){
                     reject(new Error(err))
                 } else {
@@ -59,7 +59,7 @@ module.exports = {
     },
     modelUpdateItems: (data, id)=> {
         return new Promise ((resolve, reject)=> {
-            connection.query(`UPDATE product SET name='${data.name}', price='${data.price}', image='${data.image}', id_category='${data.category}' WHERE id='${id}'`, (err, result)=>{
+            connection.query(`UPDATE product SET ? WHERE id='${id}'`, data, (err, result)=>{
                 if(err){
                     reject(new Error(err))
                 } else {

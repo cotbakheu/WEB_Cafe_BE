@@ -9,6 +9,7 @@ const {
     success,
     noData,
     failed } = require('../helper/response');
+const redisClient = require('../config/redis');
 
 
 module.exports = {
@@ -17,60 +18,37 @@ module.exports = {
             const data = JSON.stringify(response);
             redisClient.set('history', data);
         }).catch((err)=>{
-            failed(res, "Can't Get Data", err)
+            failed(res, "Can't Get Data")
         })
     },
     getAllHistory : async(req,res)=>{
         //sort
-        const sort = req.query.sort;
-        const sortBy = sort === undefined? '':`ORDER BY ${sort}`;
+        const sort = req.query.sort? req.query.sort: 'DESC';
+        const params = req.query.params? req.query.params: 'date';
         //pagination
-        const paging = req.query.page;
-        const queryLimit = req.query.limit;
-        const limit = queryLimit === undefined? 6: queryLimit;
-        const offset = paging <= 1? 0:(paging-1)*limit;
-        const page = paging === undefined? `LIMIT ${limit}`:`LIMIT ${offset},${limit}`;
-        //search
-        const find = req.query.search;        
-        const search = find === undefined? '': `WHERE history.cashier LIKE '%${find}%' OR history.date LIKE '%${find}%' OR history.invoice LIKE '%${find}%'`;
-        const totalData = await modelTotalHistory();
-        modelAllHistory(sortBy, page, search)
+        const page = req.query.page? req.query.page:1;
+        const limit = req.query.limit? req.query.limit: 7;
+        const offset = page <= 1? 0:(page-1)*limit;
+        //search        
+        const search = req.query.search? req.query.search: '%' ;
+        const totalData = await modelTotalHistory(search);
+
+        modelAllHistory(params, sort, limit, offset, search)
             .then((response)=> {
-                const arr = [];
-                response.forEach(element => {
-                    arr.push({
-                        id: element.id,
-                        invoice: element.invoice,
-                        cashier: element.cashier,
-                        category: element.total,
-                        quantity: element.quantity,
-                        amount: element.total_price,
-                    })
-                });
-                if (arr.length < 1){
+                if (response.length < 1){
                     noData(res, 'Data Not Found')
                 } else {
-                    const pages = paging === undefined? 1: paging;
-                    if (find !== undefined){
-                        const result = {
-                          page: pages,
-                          limit: limit,
-                          totalData: arr.length,
-                          totalPage: Math.ceil(arr.length/limit)
-                      }
-                      success(res, "Succes Get Data", result, arr)
-                    } else {
-                        const result = {
-                            page: pages,
-                            limit: limit,
-                            totalData: totalData[0].total,
-                            totalPage: Math.ceil(totalData[0].total/limit)
+                        const pagination = {
+                          page,
+                          limit,
+                          totalData: totalData.length,
+                          totalPage: Math.ceil(totalData.length/limit)
                         }
                         module.exports.setHistoryRedis()
-                        success(res, "Succes Get Data", result, arr)
-                      } 
+                      success(res, "Succes Get Data", pagination, response) 
                 }
             }).catch((err)=>{
+                console.log(err)
                 failed(res, "Can't Get Data", err)
             })
     },
@@ -78,25 +56,32 @@ module.exports = {
     const data = req.body;
     const validation = true;
     const validData = data.map((element)=>{
-        if(!element.invoice || !element.cashier || !element.product || !element.total_product || !element.price){
-             return validation;
-        } else {
+        if(!element.invoice || !element.cashier || !element.id_product || !element.total_product || !element.price){
              return !validation;
+        } else {
+             return validation;
         }
     });
-    const checkData = validData.filter((element)=>element === true);
+    const checkData = validData.filter((element)=>element === false);
         if(checkData.length >= 1) {
-            failed(res, "Invalid data Input", err)   
+            failed(res, "Invalid data Input")   
         }else {
-            data.map((element)=>{
+            const result = data.map((element)=>{
                 modelInsertHistory(element) 
-                .then((response)=> {
-                    module.exports.setHistoryRedis()
-                    success(res, 'Succesful Insert Data')
+                .then((response)=> {                    
+                    return response
+                    // success(res, 'Succesful Insert Data')
                 }).catch((err)=>{
-                    failed(res, "Internal Server Error", err)
+                    console.log(err)
+                    // failed(res, "Internal Server Error")
                 })
             })
+            if(result) {
+                module.exports.setHistoryRedis()
+                success(res, 'Succesful Insert Data', {}, {})
+            } else {
+                console.log('error')
+            }
         }
     },
     updateHistory : (req,res)=>{

@@ -12,27 +12,30 @@ module.exports = {
       }else{
         if(result){;
           const response = JSON.parse(result);
-          const name = req.query.name ? req.query.name:'';
-          const limit = req.query.limit ? req.query.limit:3;
+          const search = req.query.search ? req.query.search.toString().toLowerCase():'';
+          const limit = req.query.limit ? req.query.limit:6;
           const page = req.query.page ? req.query.page:1;
           const offset = page === 1 ? 0 : (page-1)*limit;
-          const sort = req.query.sort? req.query.sort:'name';
-          const order = req.query.order? req.query.order:'asc';
+          const params = req.query.params? req.query.params:'name';
+          const sort = req.query.sort? req.query.sort:'asc';
 
-          
-          const search = _.filter(response, (item) => {
-            return item.name.includes(name)
+          const searchData = _.filter(response, (item) => {
+            return item.name.toLowerCase().includes(search)
           });
-          const orderData = _.orderBy(search, sort, order);
-          const data = _.slice(orderData, offset, offset+limit);
+          if (searchData.length < 1) {
+            noData(res, 'Data Not Found')
+          } else {
+            const orderData = _.orderBy(searchData, params, sort);
+            const data = _.slice(orderData, offset, offset+limit);
 
-          const newResult = {
-            page: page,
-            limit: limit,
-            totalData: search.length,
-            totalPage: Math.ceil(search.length/limit)
+            const newResult = {
+              page: page,
+              limit: limit,
+              totalData: searchData.length,
+              totalPage: Math.ceil(searchData.length/limit)
+            }
+            success(res, "Succes Get Data from redis", newResult, data)
           }
-          success(res, "Succes Get Data from redis", newResult, data)
         }else{
           next()
         }

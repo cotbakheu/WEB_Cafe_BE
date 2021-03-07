@@ -12,6 +12,6 @@ const Router = express.Router()
 Router
   .post('/login', login)
   .post('/register', register)
-  .patch('/register/:id', authentication, updateUser)
+  .patch('/updateuser/:id', authentication, updateUser)
 
 module.exports = Router

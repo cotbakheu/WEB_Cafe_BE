@@ -11,8 +11,8 @@ const { authentication,
 const { getHistoryRedis} = require('../helper/redis/history');
 
 route
-    .get('/history', authentication, adminAuthorization, getHistoryRedis, getAllHistory)         //admin
-    .post('/history',authentication, cashierAuthorization, insertHistory)                        //cashier
+    .get('/history', getHistoryRedis, getAllHistory)         //admin
+    .post('/history', insertHistory)                        //cashier
     .put('/history/:id', authentication, adminAuthorization, updateHistory)                      //admin
     .patch('/history/:id', authentication, adminAuthorization, updateHistory)                    //admin
     .delete('/history/:id', authentication, adminAuthorization, deleteHistory)                   //admin
