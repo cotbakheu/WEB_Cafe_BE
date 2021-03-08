@@ -3,7 +3,8 @@ const { modelAllHistory,
         modelInsertHistory, 
         modelUpdateHistory, 
         modelDeleteHistory,
-        modelAllHistoryRedis } = require('../model/history');
+        modelAllHistoryRedis,
+        modelDetailHistory } = require('../model/history');
 
 const {
     success,
@@ -83,6 +84,14 @@ module.exports = {
                 console.log('error')
             }
         }
+    },
+    detailHistroy: (req, res)=> {
+        const invoice = req.params.invoice;
+        modelDetailHistory(invoice).then((response)=>{
+            success(res, 'Success get detail history')
+        }).catch((err)=>{
+            failed(res, 'server error')
+        })
     },
     updateHistory : (req,res)=>{
         const id = req.params.id;

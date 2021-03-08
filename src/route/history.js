@@ -3,7 +3,8 @@ const route = express.Router();
 const { getAllHistory,
         insertHistory,
         updateHistory,
-        deleteHistory  } = require('../controller/history');
+        deleteHistory,
+        detailHistroy  } = require('../controller/history');
 
 const { authentication,
         adminAuthorization,
@@ -11,8 +12,9 @@ const { authentication,
 const { getHistoryRedis} = require('../helper/redis/history');
 
 route
-    .get('/history', getHistoryRedis, getAllHistory)         //admin
-    .post('/history', insertHistory)                        //cashier
+    .get('/history',authentication, adminAuthorization, getHistoryRedis, getAllHistory)
+    .get('/history/:invoice',authentication, adminAuthorization, detailHistroy)
+    .post('/history',authentication, cashierAuthorization, insertHistory)         //kasir
     .put('/history/:id', authentication, adminAuthorization, updateHistory)                      //admin
     .patch('/history/:id', authentication, adminAuthorization, updateHistory)                    //admin
     .delete('/history/:id', authentication, adminAuthorization, deleteHistory)                   //admin

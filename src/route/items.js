@@ -14,7 +14,6 @@ const singleUpload = require('../helper/middleware/upload');
 route
 //product route
   .get('/items', authentication, getItemsRedis, getAllItems)
-  .get('/items', authentication, adminAuthorization, getAllItems)              //cashier & admin
   .post('/items', authentication, adminAuthorization, singleUpload, insertItems)        //admin
   .put('/items/:id', authentication, adminAuthorization, singleUpload, updateItems)     //admin
   .patch('/items/:id', authentication, adminAuthorization, updateItems)   //admin
