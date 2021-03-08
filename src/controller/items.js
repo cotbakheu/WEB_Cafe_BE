@@ -54,12 +54,14 @@ module.exports = {
     },
     insertItems : async(req,res)=>{
     const data = req.body;
+    console.log(req.file)
     const newData = {
         name: data.name,
         price: data.price,
         image: req.file.filename,
         category: data.category,
     };
+    console.log(data)
         modelInsertItems(newData)
         .then((response)=> {
             module.exports.setItemsRedis()
