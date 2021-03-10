@@ -57,9 +57,8 @@ module.exports = {
         name: data.name,
         price: data.price,
         image: req.file.filename,
-        category: data.category,
+       category: data.category,
     };
-    console.log(newData)
         modelInsertItems(newData)
         .then((response)=> {
             module.exports.setItemsRedis()

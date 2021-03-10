@@ -19,7 +19,7 @@ app.use(categoryRoute);
 app.use(userRoute);
 require('dotenv').config();
 
-
+app.use('/image', express.static('./public/images'))
 
 
 app.listen(process.env.PORT, ()=> {
