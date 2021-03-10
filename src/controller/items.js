@@ -15,7 +15,6 @@ const fs = require('fs');
 module.exports = {
     setItemsRedis: (req, res) => {
         modelAllItemsRedis().then((response)=>{
-            console.log(response)
             const data = JSON.stringify(response);
             redisClient.set('items', data);
         }).catch((err)=>{
@@ -54,14 +53,13 @@ module.exports = {
     },
     insertItems : async(req,res)=>{
     const data = req.body;
-    console.log(req.file)
     const newData = {
         name: data.name,
         price: data.price,
         image: req.file.filename,
         category: data.category,
     };
-    console.log(data)
+    console.log(newData)
         modelInsertItems(newData)
         .then((response)=> {
             module.exports.setItemsRedis()
