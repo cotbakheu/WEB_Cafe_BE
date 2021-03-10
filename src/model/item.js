@@ -4,7 +4,7 @@ module.exports = {
     //product model
     modelAllItems: (params, sort, limit, offset, search)=> {
         return new Promise ((resolve, reject)=> {
-            connection.query(`SELECT * FROM product LEFT JOIN category ON product.id_category = category.id WHERE product.name LIKE '%${search}%' ORDER BY ${params} ${sort} LIMIT ${offset},${limit} `, (err, result)=>{
+            connection.query(`SELECT * FROM product JOIN category ON product.id_category = category.category_id WHERE product.name LIKE '%${search}%' ORDER BY ${params} ${sort} LIMIT ${offset},${limit} `, (err, result)=>{
                 if(err){
                     reject(new Error(err))
                 } else {
@@ -15,7 +15,7 @@ module.exports = {
     },
     modelDetailItems: (id)=> {
         return new Promise ((resolve, reject)=> {
-            connection.query(`SELECT * FROM product JOIN category ON product.id_category = category.id WHERE product.id='${id}'`, (err, result)=>{
+            connection.query(`SELECT * FROM product JOIN category ON product.id_category = category.category_id WHERE product.id='${id}'`, (err, result)=>{
                 if(err){
                     reject(new Error(err))
                 } else {
@@ -26,7 +26,7 @@ module.exports = {
     },
     modelAllItemsRedis: ()=> {
         return new Promise ((resolve, reject)=> {
-            connection.query(`SELECT * FROM product JOIN category ON product.id_category = category.id`, (err, result)=>{
+            connection.query(`SELECT * FROM product JOIN category ON product.id_category = category.category_id`, (err, result)=>{
                 if(err){
                     reject(new Error(err))
                 } else {
