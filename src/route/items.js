@@ -16,7 +16,7 @@ route
   .get('/items', authentication, getItemsRedis, getAllItems)
   .post('/items', authentication, adminAuthorization, singleUpload, insertItems)        //admin
   .put('/items/:id', authentication, adminAuthorization, singleUpload, updateItems)     //admin
-  .patch('/items/:id', authentication, adminAuthorization, updateItems)   //admin
+  .patch('/items/:id', authentication, adminAuthorization,singleUpload, updateItems)   //admin
   .delete('/items/:id', authentication, adminAuthorization, deleteItems)  //admin
 
 module.exports = route

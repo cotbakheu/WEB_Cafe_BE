@@ -15,10 +15,11 @@ module.exports = {
         }
         res.json(response)
     },
-    failed: (res, message) => {
+    failed: (res, message, err) => {
         const response = {
             code: 500,
             message,
+            err,
         }
         res.json(response)
     },

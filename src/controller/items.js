@@ -51,6 +51,14 @@ module.exports = {
           failed(res, "Server Error", err)
       })
     },
+    detailItem: (req, res)=> {
+        const id = req.params.id
+        modelDetailItems(id).then((response)=>{
+            success(res, 'Get Detail Success', {}, response)
+        }).catch((err)=> {
+            failed(res, 'Server Error')
+        })
+    },
     insertItems : async(req,res)=>{
     const data = req.body;
     const newData = {
@@ -68,16 +76,16 @@ module.exports = {
             failed(res, "Internal Server Error", err)
         })
     },
-    updateItems : async(req,res)=>{
-        const id = req.params.id;
+    updateItems : async(req,res)=>{        
         const data = req.body;
+        const id = req.params.id;
         const delImage = await modelDetailItems(id);
-        const path = `./public/img/${delImage[0].image}`;
+        const path = `./public/images/${delImage[0].image}`;
         const newData = {
             name: data.name,
             price: data.price,
             image: req.file.filename,
-            id_category: data.id_category
+            id_category: data.category
         }
         fs.unlink(path, (err) => {
             if (err) {
@@ -97,7 +105,7 @@ module.exports = {
     deleteItems : async(req,res)=>{
     const id = req.params.id;
     const delImage = await modelDetailItems(id);
-    const path = `./public/img/${delImage[0].image}`;
+    const path = `./public/images/${delImage[0].image}`;
     try {
         fs.unlinkSync(path);
         modelDeleteItems(id)
