@@ -17,6 +17,6 @@ route
     .post('/history',authentication, cashierAuthorization, insertHistory)         //kasir
     .put('/history/:id', authentication, adminAuthorization, updateHistory)                      //admin
     .patch('/history/:id', authentication, adminAuthorization, updateHistory)                    //admin
-    .delete('/history/:id', authentication, adminAuthorization, deleteHistory)                   //admin
+    .delete('/history/:invoice', authentication, adminAuthorization, deleteHistory)                   //admin
 
 module.exports = route

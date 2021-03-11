@@ -106,8 +106,8 @@ module.exports = {
         })
     },
     deleteHistory : (req,res)=>{
-    const id = req.params.id
-        modelDeleteHistory(id)
+    const invoice = req.params.invoice
+        modelDeleteHistory(invoice)
         .then((response)=> {
             module.exports.setHistoryRedis()
             success(res, 'Succesful Delete Data')

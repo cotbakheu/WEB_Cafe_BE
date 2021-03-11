@@ -36,7 +36,7 @@ module.exports = {
     },
     modelDetailHistory: (invoice)=> {
         return new Promise ((resolve, reject)=> {
-            connection.query(`SELECT history.id, history.invoice, history.cashier, history.date, history.price, product.name FROM history LEFT JOIN product ON history.id_product = product.id WHERE history.invoice Like ='${invoice}'`, (err, result)=>{
+            connection.query(`SELECT history.id, history.invoice, history.cashier, history.date, history.price, product.name history.total_product FROM history LEFT JOIN product ON history.id_product = product.id WHERE history.invoice LIKE '%${invoice}%'`, (err, result)=>{
                 if(err){
                     reject(new Error(err))
                 } else {
@@ -67,9 +67,9 @@ module.exports = {
             })    
         })
     },
-    modelDeleteHistory: (id)=> {
+    modelDeleteHistory: (invoice)=> {
         return new Promise ((resolve, reject)=> {
-            connection.query(`DELETE FROM history WHERE id='${id}'`, (err, result)=>{
+            connection.query(`DELETE FROM history WHERE invoice LIKE '%${invoice}%'`, (err, result)=>{
                 if(err){
                     reject(new Error(err))
                 } else {
