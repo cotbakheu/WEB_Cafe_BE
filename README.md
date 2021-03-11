@@ -40,12 +40,13 @@ git clone https://github.com/cotbakheu/WEB_Cafe_BE
     - `db_password` : fill with PASSWORD in your database configuration (Or leave it null if your database haven't password)
     - `db_name`     : fill with the NAME OF DATABASE
     - `JWT_SECRET`  : fill with the unique value due to signature verifier on JWT
-
-5. Use this command to install all dependencies
+5. Run redis :
+    - `redis-server` : to run redis server (https://redis.io/)
+6. Use this command to install all dependencies
 ```
 npm install
 ```
-6. You can install nodemon for easier development (optional)
+7. You can install nodemon for easier development (optional)
  * local
 ```
 npm install nodemon
@@ -54,7 +55,7 @@ npm install nodemon
 ```
 npm install -g nodemon
 ```
-7. Run the server
+8. Run the server
  * With nodemon installed
 ```
 nodemon
