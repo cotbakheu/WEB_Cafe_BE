@@ -87,8 +87,9 @@ module.exports = {
     },
     detailHistroy: (req, res)=> {
         const invoice = req.params.invoice;
+        console.log(invoice)
         modelDetailHistory(invoice).then((response)=>{
-            success(res, 'Success get detail history')
+            success(res, 'Success get detail history',{}, response,)
         }).catch((err)=>{
             failed(res, 'server error')
         })
