@@ -21,7 +21,7 @@ module.exports = {
         if (access === 0){
             next();
         }else {
-            failed(res, 'Error Authorization');
+            failed(res, 'Admin Authorization');
         }
     },
     cashierAuthorization: (req, res, next) => {
@@ -29,7 +29,7 @@ module.exports = {
         if (access === 1){
             next();
         }else {
-            failed(res, 'Error Authorization');
+            failed(res, 'Cashier Authorization');
         }
     }
 }

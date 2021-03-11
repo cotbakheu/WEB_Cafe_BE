@@ -38,7 +38,7 @@ module.exports = {
             total: filterData.length,
             totalPage: Math.ceil(filterData.length/limit)
           }
-          success(res, 'Get all books from redis success', pagination, data)
+          success(res, 'Get all history from redis success', pagination, data)
         }else{
           next()
         }
