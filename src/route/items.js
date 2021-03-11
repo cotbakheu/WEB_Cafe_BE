@@ -3,7 +3,8 @@ const route = express.Router();
 const { getAllItems, 
         insertItems, 
         updateItems, 
-        deleteItems,  } = require('../controller/items');
+        deleteItems,
+	detailItem  } = require('../controller/items');
 const { authentication,
         adminAuthorization,
         cashierAuthorization } = require('../helper/middleware/auth');
@@ -18,5 +19,6 @@ route
   .put('/items/:id', authentication, adminAuthorization, singleUpload, updateItems)     //admin
   .patch('/items/:id', authentication, adminAuthorization,singleUpload, updateItems)   //admin
   .delete('/items/:id', authentication, adminAuthorization, deleteItems)  //admin
+  .get('/items/:id', authentication, adminAuthorization, detailItem)
 
 module.exports = route
