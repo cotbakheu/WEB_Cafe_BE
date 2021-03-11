@@ -33,11 +33,19 @@ Here is few step to run the server of Payment Web:
 ```
 git clone https://github.com/cotbakheu/WEB_Cafe_BE
 ``` 
-4. Use this command to install all dependencies
+4. Set ".env" file in root :
+    - `PORT`        : fill for set the API running port
+    - `db_host`     : fill with HOSTNAME in your  database configuration
+    - `db_user`     : fill with USERNAME in your database configuration
+    - `db_password` : fill with PASSWORD in your database configuration (Or leave it null if your database haven't password)
+    - `db_name`     : fill with the NAME OF DATABASE
+    - `JWT_SECRET`  : fill with the unique value due to signature verifier on JWT
+
+5. Use this command to install all dependencies
 ```
 npm install
 ```
-5. You can install nodemon for easier development (optional)
+6. You can install nodemon for easier development (optional)
  * local
 ```
 npm install nodemon
@@ -46,7 +54,7 @@ npm install nodemon
 ```
 npm install -g nodemon
 ```
-6. Run the server
+7. Run the server
  * With nodemon installed
 ```
 nodemon
