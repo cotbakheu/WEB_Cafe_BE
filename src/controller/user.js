@@ -22,7 +22,7 @@ module.exports = {
                 access: response[0].access
               };
               const token = jwt.sign(userData, process.env.JWT_SECRET);
-              success(res, 'login Succes', {}, {token,id: response[0].id, email: response[0].email, access: response[0].access})
+              success(res, 'login Succes', {}, {token,id: response[0].id, username:response[0].username, email: response[0].email, access: response[0].access})
             }else{
               failed(res, 'Wrong Password')
             }
