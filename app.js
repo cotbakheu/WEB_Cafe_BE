@@ -5,6 +5,8 @@ const itemsRoute = require('./src/route/items');
 const historyRoute = require('./src/route/history');
 const categoryRoute = require('./src/route/category');
 const userRoute = require('./src/route/user');
+//history
+const history = require('connect-history-api-fallback')
 
 
 
@@ -21,6 +23,11 @@ require('dotenv').config();
 
 app.use('/image', express.static('./public/images'))
 
+app.use(history({
+    verbose: true
+}))
+
+app.use('/', express.static('./dist'))
 
 app.listen(process.env.PORT, ()=> {
     console.log('Server Working Succesfully')
