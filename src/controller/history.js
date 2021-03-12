@@ -91,7 +91,8 @@ module.exports = {
         modelDetailHistory(invoice).then((response)=>{
             success(res, 'Success get detail history',{}, response,)
         }).catch((err)=>{
-            failed(res, 'server error')
+            	console.log(err)
+		failed(res, 'server error')
         })
     },
     updateHistory : (req,res)=>{
